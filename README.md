@@ -1,7 +1,7 @@
 # MMDC-Net: Multi-layer Multi-scale Dilated Convolution Network for Retinal Vessel Segmentation
 
 
-- The code is based on: Python 2.7 + pytorch 0.4.0.
+- The code is based on: Python 3.0 + pytorch 0.4.0.
 
 
 ## Quick usage on your data:
