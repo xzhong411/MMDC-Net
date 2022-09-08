@@ -2,7 +2,10 @@
 <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-v1.9.0-red.svg?logo=PyTorch&style=for-the-badge" /></a>
 <a href="#"><img src="https://img.shields.io/badge/python-v3.6+-blue.svg?logo=python&style=for-the-badge" /></a>
 
-![input and output for a random image in the test dataset](../MMDC-Net/16_test.png)![input and output for a random label in the test dataset](../MMDC-Net/16_test_label.png)
+<<<<<<< HEAD
+![input and output for a random image in the test dataset](/img/16_test.png)![input and output for a random label in the test dataset](/img/16_test_label.png)
+
+>>>>>>> 7e954af8fa9e3d3ede2505e9875cc56cb0809da8
 
 
 Customized implementation of the [MMDC-Net](https://xxx) in PyTorch
@@ -78,4 +81,8 @@ Original paper by Xiang Zhong, Hongbin Zhang,...:
 
 [Do You Need Sharpened Details? Asking MMDC-Net: Multi-layer Multi-scale Dilated Convolution Network For Retinal Vessel Segmentation](https://xxx)
 
-![network architecture](../MMDC-Net/network.png)
+<<<<<<< HEAD
+![network architecture](/img/network.png)
+=======
+![network architecture](/network.png)
+>>>>>>> 7e954af8fa9e3d3ede2505e9875cc56cb0809da8
