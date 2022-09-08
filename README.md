@@ -79,8 +79,4 @@ Original paper by Xiang Zhong, Hongbin Zhang,...:
 
 [Do You Need Sharpened Details? Asking MMDC-Net: Multi-layer Multi-scale Dilated Convolution Network For Retinal Vessel Segmentation](https://xxx)
 
-<<<<<<< HEAD
 ![network architecture](/img/network.png)
-=======
-![network architecture](/network.png)
->>>>>>> 7e954af8fa9e3d3ede2505e9875cc56cb0809da8
