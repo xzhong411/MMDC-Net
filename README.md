@@ -2,7 +2,7 @@
 <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-v1.9.0-red.svg?logo=PyTorch&style=for-the-badge" /></a>
 <a href="#"><img src="https://img.shields.io/badge/python-v3.6+-blue.svg?logo=python&style=for-the-badge" /></a>
 
-![input and output for a random image in the test dataset](/img/16_test.png)![input and output for a random label in the test dataset](/img/16_test_label.png)
+![image](/img/16_test.png)![label](/img/16_test_label.png)
 
 
 
