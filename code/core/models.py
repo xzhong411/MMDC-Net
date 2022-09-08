@@ -50,8 +50,6 @@ class UNet(nn.Module):
         x3 = self.down2(x2)
         x4 = self.down3(x3)
         x5 = self.down4(x4)
-
-        
         x1_1 = self.newmodel1(x1,x2)
         x2_1 = self.newmodel2(x1,x2,x3)
         x3_1 = self.newmodel3(x2,x3,x4)

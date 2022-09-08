@@ -28,7 +28,7 @@ model_name= 'MNet'
 # --------------------------------------------------------------------------------
 parser = argparse.ArgumentParser(description='PyTorch ASOCT_Demo')
 
-parser.add_argument('--epochs', type=int, default=60,
+parser.add_argument('--epochs', type=int, default=100,
                     help='the epochs of this run')
 parser.add_argument('--n_class', type=int, default=2,
                     help='the channel of out img, decide the num of class, ASOCT_eyes is 2/4 class')
@@ -41,8 +41,8 @@ parser.add_argument('--BatchNorm', type=bool, default=False,
 # ---------------------------
 # model
 # ---------------------------
-parser.add_argument('--data_path', type=str, default='../data/CHASEDB1_1',help='dir of the all img')
-parser.add_argument('--model_save', type=str, default='../models/chase_best_model.pth',help='dir of the model.pth')
+#parser.add_argument('--data_path', type=str, default='../data/CHASEDB1_1',help='dir of the all img')
+#parser.add_argument('--model_save', type=str, default='../models/chase_best_model.pth',help='dir of the model.pth')
 
 # parser.add_argument('--data_path', type=str, default='../data/CVC-612',help='dir of the all img')
 # parser.add_argument('--model_save', type=str, default='../models/cvc_best_model.pth',help='dir of the model.pth')
@@ -50,11 +50,11 @@ parser.add_argument('--model_save', type=str, default='../models/chase_best_mode
 # parser.add_argument('--data_path', type=str, default='../data/CVC-ClinicDB',help='dir of the all img')
 # parser.add_argument('--model_save', type=str, default='../models/clin_best_model.pth',help='dir of the model.pth')
 
-# parser.add_argument('--data_path', type=str, default='../data/DRHAGIS_1',help='dir of the all img')
+# parser.add_argument('--data_path', type=str, default='../data/DRHAGIS',help='dir of the all img')
 # parser.add_argument('--model_save', type=str, default='../models/drha_best_model.pth',help='dir of the model.pth')
 
-# parser.add_argument('--data_path', type=str, default='../data/HRF',help='dir of the all img')
-# parser.add_argument('--model_save', type=str, default='../models/hr_best_model.pth',help='dir of the model.pth')
+parser.add_argument('--data_path', type=str, default='../data/HRF',help='dir of the all img')
+parser.add_argument('--model_save', type=str, default='../models/HRF_best_model.pth',help='dir of the model.pth')
 
 # parser.add_argument('--data_path', type=str, default='../data/Kvasir-SEG',help='dir of the all img')
 # parser.add_argument('--model_save', type=str, default='../models/SEG_best_model.pth',help='dir of the model.pth')
@@ -66,7 +66,7 @@ parser.add_argument('--model_save', type=str, default='../models/chase_best_mode
 # parser.add_argument('--model_save', type=str, default='../models/stare_best_model.pth',help='dir of the model.pth')
 parser.add_argument('--my_description', type=str, default='',
                     help='some description define your training')
-parser.add_argument('--batch_size', type=int, default=6,
+parser.add_argument('--batch_size', type=int, default=2,
                     help='the num of img in a batch')
 parser.add_argument('--img_size', type=int, default=512,
                     help='the training img size')
@@ -99,17 +99,17 @@ EPS = 1e-12
 # define path
 data_path = args.data_path
 
+
+
 # 随机将数据划分为5分。为了确保每次划分的结果都一样，加入随机数种子。
-
-
-train_img_list=glob.glob(os.path.join(data_path, 'train/image/*.png'))
-test_img_list=glob.glob(os.path.join(data_path, 'test/image/*.png'))
-# train_img_list,test_img_list = get_kflod_data(args.data_path,Kflod=2)
+# img_list = get_img_list(args.data_path, flag='training')
+# test_img_list = get_img_list(args.data_path, flag='test')
+train_img_list,test_img_list = get_kflod_data(args.data_path,Kflod=2)
 # print(sorted(train_img_list)==sorted(d)) # 判斷每次身成的數據是否相同
 
 optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
-criterion = RecallCrossEntropy()
-# criterion = nn.NLLLoss2d()
+# criterion = RecallCrossEntropy()
+criterion = nn.NLLLoss2d()
 softmax_2d = nn.Softmax2d()
 
 IOU_best = 0
@@ -124,9 +124,14 @@ with open(r'../logs/%s_%s.txt' % (model_name, args.my_description), 'w+') as f:
     f.write('training lens: '+str(len(train_img_list))+' | test lens: '+str(len(test_img_list)))
     f.write('\n\n---------------------------------------------\n\n')
 
+train_losses = []
+train_acces = []
+eval_losses = []
+eval_acces = []
 for epoch in range(args.epochs):
     model.train()
-
+    train_loss = 0
+    train_acc = 0
     begin_time = time.time()
     print ('This model is %s_%s_%s_%s' % (
         model_name, args.n_class, args.img_size, args.my_description))
@@ -144,10 +149,10 @@ for epoch in range(args.epochs):
         img, gt, tmp_gt, img_shape,label_ori = get_data(args.data_path, path, img_size=args.img_size, gpu=args.use_gpu)
         optimizer.zero_grad()
         out = model(img)
-        # out = torch.log(softmax_2d(out) + EPS)
+        out = torch.log(softmax_2d(out) + EPS)
         loss = criterion(out, gt)
 
-        # out = torch.log(softmax_2d(out) + EPS)
+        out = torch.log(softmax_2d(out) + EPS)
         loss.backward()
         optimizer.step()
 
@@ -160,9 +165,94 @@ for epoch in range(args.epochs):
         print(str('model: {:s}_{:s} | epoch_batch: {:d}_{:d} | loss: {:f}  | Acc: {:.3f} | Se: {:.3f} | Sp: {:.3f}| f1: {:.3f} | IU: {:.3f}| Dice: {:.3f}'
                   ).format(model_name, args.my_description,epoch, i, loss.item(), Acc,Se,Sp,
                                                                                   f1,IU,Dice))
+        train_loss += loss.item()
+        train_acc += Acc
 
     print('training finish, time: %.1f s' % (time.time() - begin_time))
+    train_losses.append((train_loss/ len(train_img_list))*args.batch_size)
+    train_acces.append((train_acc / len(train_img_list))*args.batch_size)
     if epoch % 10 == 0 and epoch != 0:
         torch.save(model.state_dict(), args.model_save)
         print('success save Nucleus_best model')
+    torch.save(model.state_dict(), args.model_save)
+    eval_loss = 0
+    eval_acc = 0
+    ACC = []
+    SE = []
+    SP = []
+    AUC = []
+    F1 = []
+    meanDice = []
+    meanIU = []
+    alltime = []
+    model.eval()
+    for i, img_path in enumerate(test_img_list):
+        with torch.no_grad():
+            test_img, test_gt, tmp_gt, img_shape,label_ori = get_data(args.data_path, [img_path], img_size=args.img_size, gpu=args.use_gpu)
+            out= model(test_img)
+            out = torch.log(softmax_2d(out) + EPS)
+            loss_1 = criterion(out,test_gt)
+
+            eval_loss +=loss_1.item()
+            out = torch.log(softmax_2d(out) + EPS)
+
+            out = F.upsample(out, size=(img_shape[0][0], img_shape[0][1]), mode='bilinear')
+            out = out.cpu().data.numpy()
+
+            y_pred = out[:, 1, :, :]
+            y_pred = y_pred.reshape([-1])
+            ppi = np.argmax(out, 1)
+
+            tmp_out = ppi.reshape([-1])
+            tmp_gt = label_ori.reshape([-1])
+
+            my_confusion = metrics.confusion_matrix(tmp_out, tmp_gt).astype(np.float32)
+            IU,Dice,Acc,Se,Sp,f1= calculate_Accuracy(my_confusion)
+            eval_acc += Acc
+            Auc = roc_auc_score(tmp_gt, y_pred)
+            AUC.append(Auc)
+            ACC.append(Acc)
+            SE.append(Se)
+            SP.append(Sp)
+            F1.append(f1)
+            meanIU.append(IU)
+            meanDice.append(Dice)
+
+
+
+            fpr, tpr, thresh = metrics.roc_curve(tmp_gt, y_pred)
+            # print(fpr)
+            auc = metrics.roc_auc_score(tmp_gt, y_pred)
+
+    eval_losses.append(eval_loss / len(test_img_list))
+    eval_acces.append(eval_acc / len(test_img_list))
+    print('Acc: %s  |  Se: %s |  Sp: %s |  Auc: %s |  f1: %s  |  IU: %s  |  Dice: %s |  time:%s' % (
+        str(np.mean(np.stack(ACC))), str(np.mean(np.stack(SE))), str(np.mean(np.stack(SP))), str(np.mean(np.stack(AUC))),
+        str(np.mean(np.stack(F1))),str(np.mean(np.stack(meanIU))),str(np.mean(np.stack(meanDice))),str(np.mean(alltime))))
+plt.figure(dpi=600)
+x1 = range(0,args.epochs)
+x2 = range(0,args.epochs)
+y1 = eval_acces
+y11 = train_acces
+y2=  eval_losses
+y22 = train_losses
+plt.figure(dpi=600)
+
+plt.plot(x1,y1,label="validate")
+plt.plot(x1,y11,label="train")
+
+plt.ylabel('accuracy')
+plt.xlabel("epochs")
+plt.legend()
+plt.savefig('./s1.png')
+plt.show()
+plt.figure(dpi=600)
+plt.plot(x2,y2,label="validate")
+plt.plot(x2,y22,label="train")
+plt.xlabel("epochs")
+plt.ylabel('loss')
+
+plt.legend()
+plt.savefig('./s2.png')
+plt.show()
 
