@@ -1,10 +1,8 @@
 # Do You Need Sharpened Details? Asking MMDC-Net: Multi-layer Multi-scale Dilated Convolution Network For Retinal Vessel Segmentation
-<a href="#"><img src="https://img.shields.io/github/workflow/status/milesial/PyTorch-UNet/Publish%20Docker%20image?logo=github&style=for-the-badge" /></a>
-<a href="https://hub.docker.com/r/milesial/unet"><img src="https://img.shields.io/badge/docker%20image-available-blue?logo=Docker&style=for-the-badge" /></a>
 <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-v1.9.0-red.svg?logo=PyTorch&style=for-the-badge" /></a>
 <a href="#"><img src="https://img.shields.io/badge/python-v3.6+-blue.svg?logo=python&style=for-the-badge" /></a>
 
-![input and output for a random image in the test dataset](../Pytorch-UNet-master/16_test.png)![input and output for a random label in the test dataset](../Pytorch-UNet-master/16_test_label.png)
+![input and output for a random image in the test dataset](../MMDC/16_test.png)![input and output for a random label in the test dataset](../MMDC/16_test_label.png)
 
 
 Customized implementation of the [MMDC-Net](https://xxx) in PyTorch
