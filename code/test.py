@@ -79,6 +79,7 @@ def fast_test(model, args, model_name):
 
     for i, img_path in enumerate(test_img_list):
         start = time.time()
+	#Obtain the saving path of the final segmented image
         save_res_path = ('../'+img_path.split('/')[1]+'/'+img_path.split('/')[2]+'/testsave/'+img_path.split('/')[5])
         #Get normalized data, including image, label and shape
         img, gt, tmp_gt, img_shape,label_ori = get_data(args.data_path, [img_path], img_size=args.img_size, gpu=args.use_gpu)
@@ -89,7 +90,7 @@ def fast_test(model, args, model_name):
         with torch.no_grad():
             out= model(img)
             pred = np.array(out.data.cpu()[0])
-            save = np.zeros(shape=(512, 512))
+            save = np.zeros(shape=(512, 512))   #shape is (512,512)
             save[pred[0] < 0.5] = 255
             save[pred[1] < 0.5] = 0
             cv2.imwrite(save_res_path, save)   #Save the predicted image
@@ -105,7 +106,8 @@ def fast_test(model, args, model_name):
 
             tmp_out = ppi.reshape([-1])
             tmp_gt = label_ori.reshape([-1])
-
+		
+	   #Obtain the confusion matrix to calculate metrics
             my_confusion = metrics.confusion_matrix(tmp_out, tmp_gt).astype(np.float32)  #Get the confusion
             IU,Dice,Acc,Se,Sp,f1= calculate_Accuracy(my_confusion)
             Auc = roc_auc_score(tmp_gt, y_pred)
