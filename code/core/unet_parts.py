@@ -61,7 +61,7 @@ class MMDC_111(nn.Module):
         super().__init__()
         self.conv3_1 =  nn.Conv2d(out_channels*2,out_channels*2, kernel_size=1)
         self.conv3_3_1 =  nn.Sequential(nn.Conv2d(out_channels*2,out_channels*2, kernel_size=3, padding=1, dilation=1),
-                                        nn.ReLU(inplace=True))
+                                        nn.ReLU(inplace=True))                   ## conv3_3_x indicates denotes the convolution of different dilation at the lower level
         self.conv3_3_3 =  nn.Sequential(nn.Conv2d(out_channels*2,out_channels*2, kernel_size=3, padding=3, dilation=3),
                                         nn.ReLU(inplace=True))
         self.conv3_3_5 =  nn.Sequential(nn.Conv2d(out_channels*2,out_channels*2, kernel_size=3, padding=5, dilation=5),
@@ -70,7 +70,7 @@ class MMDC_111(nn.Module):
                                         nn.ReLU(inplace=True))
         self.up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
 
-        self.conv1_1 = nn.Conv2d(out_channels // 2, out_channels //2, kernel_size=1)
+        self.conv1_1 = nn.Conv2d(out_channels // 2, out_channels //2, kernel_size=1)         # conv1_3_x indicates denotes the convolution of different dilation at the upper level
         self.conv1_3_1 = nn.Sequential(
             nn.Conv2d(out_channels //2, out_channels //2, kernel_size=3, padding=1, dilation=1),
             nn.ReLU(inplace=True))
