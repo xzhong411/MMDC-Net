@@ -27,9 +27,9 @@ parser = argparse.ArgumentParser(description='PyTorch ASOCT_Demo')
 
 parser.add_argument('--epochs', type=int, default=100,
                     help='the epochs of this run')
-parser.add_argument('--n_class', type=int, default=2,
+parser.add_argument('--n_class', type=int, default=2,    #number of class,set to 2
                     help='the channel of out img, decide the num of class, ASOCT_eyes is 2/4 class')
-parser.add_argument('--lr', type=float, default=0.00015,
+parser.add_argument('--lr', type=float, default=0.00015,     #learning rate
                     help='initial learning rate')
 parser.add_argument('--GroupNorm', type=bool, default=True,
                     help='decide to use the GroupNorm')
@@ -75,27 +75,28 @@ print("  ''''''''")
 EPS = 1e-12
 # define path
 data_path = args.data_path
-train_img_list=glob.glob(os.path.join(data_path, 'train/image/*.png'))
-test_img_list=glob.glob(os.path.join(data_path, 'test/image/*.png'))
+train_img_list=glob.glob(os.path.join(data_path, 'train/image/*.png'))   #get the training images
+test_img_list=glob.glob(os.path.join(data_path, 'test/image/*.png'))    #get the testing images
 
 
 optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
-# recall loss
-criterion = RecallCrossEntropy()
+
+criterion = RecallCrossEntropy()   #recall loss
 softmax_2d = nn.Softmax2d()
 
 IOU_best = 0
 
 print('This model is %s_%s_%s_%s' % (model_name, args.n_class, args.img_size,args.my_description))
 if not os.path.exists(r'../models/%s_%s' % (model_name, args.my_description)):
-    os.mkdir(r'../models/%s_%s' % (model_name, args.my_description))
+    os.mkdir(r'../models/%s_%s' % (model_name, args.my_description))   #Model parameter description
 
+#Model run logging
 with open(r'../logs/%s_%s.txt' % (model_name, args.my_description), 'w+') as f:
     f.write('This model is %s_%s: ' % (model_name, args.my_description)+'\n')
     f.write('args: '+str(args)+'\n')
     f.write('training lens: '+str(len(train_img_list))+' | test lens: '+str(len(test_img_list)))
     f.write('\n\n---------------------------------------------\n\n')
-
+#Model training
 for epoch in range(args.epochs):
     model.train()
 
@@ -105,7 +106,7 @@ for epoch in range(args.epochs):
     random.shuffle(train_img_list)
 
     if 'arg' in args.data_path:
-        if (epoch % 10 ==  0) and epoch != 0 and epoch < 400:
+        if (epoch % 10 ==  0) and epoch != 0 and epoch < 400:  #Automatically adjust the learning rate
             args.lr /= 10
             optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
             # optimizer = torch.optim.Adam(model.parameters(),lr=adjust_learning_rate(optimizer, epoch, args.lr, args.epochs//8, args.epochs, 0.9))
@@ -115,7 +116,7 @@ for epoch in range(args.epochs):
         path = train_img_list[start:end]
         img, gt, tmp_gt, img_shape,label_ori = get_data(args.data_path, path, img_size=args.img_size, gpu=args.use_gpu)
         optimizer.zero_grad()
-        out = model(img)
+        out = model(img)      #Get the final output of the image
         # out = torch.log(softmax_2d(out) + EPS)
         loss = criterion(out, gt)
 
@@ -129,6 +130,8 @@ for epoch in range(args.epochs):
 
         my_confusion = metrics.confusion_matrix(tmp_out, tmp_gt).astype(np.float32)   #Get the confusion
         IU,Dice,Acc,Se,Sp,f1= calculate_Accuracy(my_confusion)
+
+	#Print model real-time metrics
         print(str('model: {:s}_{:s} | epoch_batch: {:d}_{:d} | loss: {:f}  | Acc: {:.3f} | Se: {:.3f} | Sp: {:.3f}| f1: {:.3f} | IU: {:.3f}| Dice: {:.3f}'
                   ).format(model_name, args.my_description,epoch, i, loss.item(), Acc,Se,Sp,
                                                                                   f1,IU,Dice))
